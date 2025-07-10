@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { darkBg: '#1e293b', darkCard: '#0f172a', darkInput: '#334155', accent: '#10b981' } } }
+    }
+  </script>
+</head>
+<body class="bg-darkBg text-white min-h-screen p-6">
+
+  <header class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-accent">Employee Dashboard</h1>
+    <div>
+      <a href="add-employee.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg mr-2 text-sm">Add Employee</a>
+      <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm">Logout</button>
+    </div>
+  </header>
+
+  <input type="text" id="searchBox" placeholder="Search by name or skills..." onkeyup="renderTable()"
+         class="w-full mb-6 px-5 py-3 rounded-lg bg-darkInput border border-gray-600 focus:outline-none focus:ring-2 focus:ring-accent" />
+
+
+  <div id="list-dashboard" class="bg-darkCard rounded-xl shadow-lg p-4 overflow-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gray-800 text-accent uppercase">
+        <tr><th class="p-3">Name</th><th>Dept.</th><th>Skills</th><th>Cert.</th><th>Interest</th><th>Avail.</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="empTable" class="text-gray-300"></tbody>
+    </table>
+    <div class="mt-4 text-right">
+      <button onclick="exportExcel()"
+              class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg text-sm">Export to Excel</button>
+    </div>
+  </div>
+
+  <script>
+    if (localStorage.getItem('isLoggedIn')!=='true') window.location.href='login.html';
+    let employees = JSON.parse(localStorage.getItem('employeeData')) || [];
+
+    if(employees.length === 0)
+    {
+        const dashboardList = document.querySelector('#list-dashboard')
+        dashboardList.style.display = 'none'
+    }
+    else  
+    {
+         document.querySelector('#list-dashboard').style.display = 'block'
+    }
+
+    function renderTable() {
+      const term = searchBox.value.toLowerCase();
+      empTable.innerHTML = '';
+
+      if(employees.length === 0)
+    {
+        const dashboardList = document.querySelector('#list-dashboard')
+        dashboardList.style.display = 'none'
+    }
+    else  
+    {
+         document.querySelector('#list-dashboard').style.display = 'block'
+    }
+
+       
+        employees.forEach((e,i) => {
+        empTable.innerHTML += `
+          <tr class="border-b border-gray-700 hover:bg-gray-800">
+            <td class="p-3">${e.name}</td>
+            <td>${e.department}</td>
+            <td>${e.skills}</td>
+            <td>${e.certifications}</td>
+            <td>${e.interests}</td>
+            <td>${e.availability}</td>
+            <td class="space-x-2 p-3">
+              <button onclick="deleteEmp(${i})" class="text-red-400 hover:underline">Delete</button>
+            </td>
+          </tr>`;
+      });
+
+    }
+
+    function deleteEmp(i) {
+      if (confirm('Delete this employee?')) {
+        employees.splice(i,1);
+        localStorage.setItem('employeeData', JSON.stringify(employees));
+        renderTable();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      window.location.href = 'login.html';
+    }
+
+    function exportExcel() {
+      const ws = XLSX.utils.aoa_to_sheet([
+        ["Name","Dept.","Skills","Cert.","Interest","Avail."],
+        ...employees.map(e => [e.name,e.department,e.skills,e.certifications,e.interests,e.availability])
+      ]);
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Employees');
+      XLSX.writeFile(wb,'Employee_Skill_Matrix.xlsx');
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>

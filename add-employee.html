@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Add Employee</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { darkBg: '#1e293b', darkCard: '#0f172a', darkInput: '#334155', accent: '#10b981' } } }
+    }
+  </script>
+</head>
+<body class="bg-darkBg text-white min-h-screen p-6">
+
+  <header class="flex justify-between mb-6">
+    <h1 class="text-accent text-2xl font-bold">Add New Employee</h1>
+    <a href="dashboard.html" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg">Go to Dashboard</a>
+  </header>
+
+  <form id="empForm" class="bg-darkCard p-6 rounded-2xl shadow-lg max-w-2xl mx-auto grid grid-cols-1 text-black gap-4">
+    <input id="name" placeholder="Name" class="input-dark px-2 py-2 rounded-sm text-sm outline-none" required />
+    <input id="department" placeholder="Department" class="input-dark px-2 py-2 rounded-sm text-sm outline-none" required />
+    <input id="skills" placeholder="Skills (comma-sep.)" class="input-dark px-2 py-2 rounded-sm text-sm outline-none" required />
+    <input id="certifications" placeholder="Certifications" class="input-dark px-2 py-2 rounded-sm text-sm outline-none" />
+    <input id="interests" placeholder="Interests" class="input-dark px-2 py-2 rounded-sm text-sm outline-none" />
+
+    <select required class="input-dark px-2 py-2 rounded-sm text-sm outline-none"  name="" id="availability">
+        <option value="">Select Available Yes / No</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+
+   
+
+
+
+    <button type="submit" class="bg-accent py-2 rounded-lg hover:bg-emerald-600 transition mt-4">Save Employee</button>
+  </form>
+
+  <style>
+    .input-dark {
+      @apply w-full px-5 py-3 rounded-lg bg-darkInput border border-gray-600 focus:outline-none focus:ring-2 focus:ring-accent text-white placeholder-gray-400;
+    }
+  </style>
+
+  <script>
+    if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'login.html';
+    const name = document.querySelector('#name')
+    let employees = JSON.parse(localStorage.getItem('employeeData')) || [];
+    document.getElementById('empForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const emp = {
+        name: name.value, department: department.value,
+        skills: skills.value, certifications: certifications.value,
+        interests: interests.value, availability: availability.value
+      };
+      employees.push(emp);
+      localStorage.setItem('employeeData', JSON.stringify(employees));
+      alert('Employee saved!');
+      empForm.reset();
+    });
+  </script>
+</body>
+</html>
